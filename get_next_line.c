@@ -54,6 +54,7 @@ int		get_next_line(const int fd, char **line)
 		if(!(current_fd->content = ft_strjoin(tmp, buff)))
 		{
 			free(*line);
+			free(tmp);
 			// peut etre liberer content
 			return (-1);
 		}
@@ -68,8 +69,11 @@ int		get_next_line(const int fd, char **line)
 			return (-1);
 		}
 		free(tmp);
-		free(current_fd->content);
-		free(current_fd);
+		if (ft_strlen(*line))
+		{
+			free(current_fd->content);
+			free(current_fd);
+		}
 	}
 	else
 	{
@@ -79,6 +83,7 @@ int		get_next_line(const int fd, char **line)
 			free(tmp);
 			return (-1);
 		}
+		free(tmp);
 		tmp = current_fd->content;
 		if(!(current_fd->content = ft_strdup(ft_strstr(current_fd->content, "\n") + 1)))
 		{
