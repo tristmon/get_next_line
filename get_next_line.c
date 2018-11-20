@@ -6,12 +6,13 @@
 /*   By: trmonich <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/19 10:07:36 by trmonich          #+#    #+#             */
-/*   Updated: 2018/11/20 10:39:23 by trmonich         ###   ########.fr       */
+/*   Updated: 2018/11/20 13:07:12 by trmonich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft/libft.h"
 #include "get_next_line.h"
+#include "stdio.h"
 
 static t_list	*get_fd(t_list **fd_list, int fd)
 {
@@ -46,8 +47,11 @@ int		get_next_line(const int fd, char **line)
 		free(*line);
 		return (-1);
 	}
-	while((nb = read(fd, buff, BUFF_SIZE)))
+		ft_putstr("buffer est (entree) : ");
+		printf("%s\n", current_fd->content); //debug
+	while(!ft_strstr(current_fd->content, "\n") && (nb = read(fd, buff, BUFF_SIZE)))
 	{
+		ft_putstr("on lit\n");
 		buff[nb] = 0;
 		//on veut join avec notre buff dans la liste
 		tmp = current_fd->content;
@@ -55,13 +59,14 @@ int		get_next_line(const int fd, char **line)
 		{
 			free(*line);
 			free(tmp);
-			// peut etre liberer content
 			return (-1);
 		}
 		free(tmp);
 	}
-	if(!ft_strstr(current_fd->content, "\n"))
+	printf("taille du buff est %zu\n", ft_strlen(current_fd->content));
+	if(ft_strlen(current_fd->content) && !ft_strstr(current_fd->content, "\n"))
 	{
+		ft_putstr("on rentre dans le sans n\n");
 		tmp = *line;
 		if(!(*line = ft_strdup(current_fd->content)))
 		{
@@ -69,14 +74,19 @@ int		get_next_line(const int fd, char **line)
 			return (-1);
 		}
 		free(tmp);
-		if (ft_strlen(*line))
-		{
-			free(current_fd->content);
-			free(current_fd);
-		}
+		ft_strclr(current_fd->content);
+		//free(current_fd->content);
+		//current_fd->content = NULL;
+		//free(current_fd);
+		//current_fd = NULL;
+		//ft_putstr("buffer est (sortie 2)");
+		//ft_putendl(current_fd->content); //debug
+		return (1);
 	}
-	else
+	else if (*((char*)(current_fd->content)) != 0)
 	{
+
+		ft_putstr("on rentre dans le  n\n");
 		tmp = *line;
 		if(!(*line = ft_strndup(current_fd->content, ft_strstr(current_fd->content, "\n") - (char*)(current_fd->content))))
 		{
@@ -91,6 +101,11 @@ int		get_next_line(const int fd, char **line)
 			return (-1);
 		}
 		free(tmp);
+		//ft_putstr("buffer est (sortie 1)");
+		//ft_putendl(current_fd->content); //debug
+		return (1);
 	}
-	return (ft_strlen(*line) ? 1 : 0);
+		//ft_putstr("buffer est (sortie 3)");
+		//ft_putendl(current_fd->content); //debug
+	return (0);
 }
